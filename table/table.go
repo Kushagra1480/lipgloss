@@ -54,6 +54,8 @@ type Table struct {
 	borderColumn bool
 	borderRow    bool
 
+	showOverflowRow bool
+
 	borderStyle lipgloss.Style
 	headers     []string
 	data        Data
@@ -85,6 +87,7 @@ func New() *Table {
 		borderLeft:   true,
 		borderRight:  true,
 		borderTop:    true,
+		showOverflowRow: true,
 		wrap:         true,
 		data:         NewStringData(),
 	}
@@ -223,6 +226,11 @@ func (t *Table) Offset(o int) *Table {
 // Wrap dictates whether or not the table content should wrap.
 func (t *Table) Wrap(w bool) *Table {
 	t.wrap = w
+	return t
+}
+
+func (t *Table) ShowOverFlowRow(show bool) *Table {
+	t.showOverflowRow = show
 	return t
 }
 
@@ -405,7 +413,7 @@ func (t *Table) constructRows(availableLines int) string {
 	rowsToRender = max(rowsToRender, 1)
 
 	// Check if we need to render an overflow row.
-	needsOverflow := rowsToRender < offsetRowCount
+	needsOverflow := t.showOverflowRow && rowsToRender < offsetRowCount
 
 	// only use the offset as the starting value if there is overflow.
 	rowIdx := t.offset
